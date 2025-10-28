@@ -1,13 +1,12 @@
 package dev.maheshbabu.authservice.dtos;
 
-
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class LoginResponseDto {
+public class SignupRequestDto {
 
-   private String email;
-   private String token;
+    private String email;
+    private String password;
 }
