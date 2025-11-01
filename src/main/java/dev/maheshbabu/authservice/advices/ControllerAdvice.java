@@ -2,6 +2,7 @@ package dev.maheshbabu.authservice.advices;
 
 import dev.maheshbabu.authservice.dtos.ErrorDto;
 import dev.maheshbabu.authservice.exceptions.IncorrectPasswordException;
+import dev.maheshbabu.authservice.exceptions.InvalidSessionException;
 import dev.maheshbabu.authservice.exceptions.UserAlreadyExistsException;
 import dev.maheshbabu.authservice.exceptions.UserNotFoundException;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +34,14 @@ public class ControllerAdvice {
         errorDto.setErrorCode("INCORRECT_PASSWORD");
         errorDto.setErrorMessage(e.getMessage());
         return new ResponseEntity<>(errorDto, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidSessionException.class)
+    private ResponseEntity<ErrorDto> invalidSessionError(Exception e) {;
+        ErrorDto errorDto = new ErrorDto();
+        errorDto.setErrorCode("INVALID_SESSION");
+        errorDto.setErrorMessage(e.getMessage());
+        return new ResponseEntity<>(errorDto, HttpStatus.NOT_FOUND);
     }
 
 

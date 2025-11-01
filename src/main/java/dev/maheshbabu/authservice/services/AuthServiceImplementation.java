@@ -1,6 +1,7 @@
 package dev.maheshbabu.authservice.services;
 
 import dev.maheshbabu.authservice.exceptions.IncorrectPasswordException;
+import dev.maheshbabu.authservice.exceptions.InvalidSessionException;
 import dev.maheshbabu.authservice.exceptions.UserAlreadyExistsException;
 import dev.maheshbabu.authservice.exceptions.UserNotFoundException;
 import dev.maheshbabu.authservice.models.Session;
@@ -8,7 +9,6 @@ import dev.maheshbabu.authservice.models.SessionStatus;
 import dev.maheshbabu.authservice.models.User;
 import dev.maheshbabu.authservice.repositories.SessionRepository;
 import dev.maheshbabu.authservice.repositories.UserRepository;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.apache.commons.lang3.*;
@@ -16,12 +16,12 @@ import org.apache.commons.lang3.*;
 import java.util.Optional;
 
 @Service
-public class UserServiceImplementation implements UserService {
+public class AuthServiceImplementation implements AuthService {
 
     private UserRepository userRepository;
     private SessionRepository sessionRepository;
 
-    public UserServiceImplementation(UserRepository userRepository, SessionRepository sessionRepository) {
+    public AuthServiceImplementation(UserRepository userRepository, SessionRepository sessionRepository) {
         this.userRepository = userRepository;
         this.sessionRepository = sessionRepository;
     }
@@ -67,9 +67,29 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public String logout(String email) throws Exception {
-        return "";
+    public String logout(String email, String token) throws Exception {
+
+       Optional<User> optionalUser = userRepository.findByEmail(email);
+
+       if(optionalUser.isEmpty()) {
+           throw new UserNotFoundException("User not found");
+       }
+
+       Optional<Session> optionalSession = sessionRepository.findByUserAndToken(optionalUser.get(), token);
+
+       if(optionalSession.isEmpty()) {
+           throw new InvalidSessionException("Invalid session");
+       }
+
+       Session session = optionalSession.get();
+
+       session.setSessionStatus(SessionStatus.LOGGED_OUT);
+
+       sessionRepository.save(session);
+
+        return "Successfully logged out";
     }
+
 
     @Override
     public User setRole(String email, String role) throws Exception {
