@@ -84,13 +84,5 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/role")
-    public ResponseEntity<LoginResponseDto> setRole(LoginRequestDto loginRequestDto) {
-
-        String email = loginRequestDto.getEmail();
-        String password = loginRequestDto.getPassword();
-        return null;
-
-    }
 
 }
