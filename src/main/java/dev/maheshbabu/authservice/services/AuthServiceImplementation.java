@@ -95,4 +95,22 @@ public class AuthServiceImplementation implements AuthService {
     public User setRole(String email, String role) throws Exception {
         return null;
     }
+
+    @Override
+    public boolean validate(long userId, String token) throws Exception {
+
+        Optional<User> optionalUser = userRepository.findById(userId);
+
+        if(optionalUser.isEmpty()) {
+           return false;
+        }
+
+        Optional<Session> optionalSession = sessionRepository.findByUserAndToken(optionalUser.get(), token);
+
+        if(optionalSession.isEmpty()){
+            return false;
+        }else {
+            return optionalSession.get().getSessionStatus() == SessionStatus.ACTIVE;
+        }
+    }
 }

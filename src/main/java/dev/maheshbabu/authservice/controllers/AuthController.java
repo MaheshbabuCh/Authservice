@@ -84,5 +84,36 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/validate")
+    public ResponseEntity<ValidationResponseDto> validate(@RequestBody ValidationRequestDto validationRequestDto) throws Exception {
+
+        long userId = validationRequestDto.getUserId();
+        String token = validationRequestDto.getToken();
+
+        try{
+            boolean isSuccess =  authService.validate(userId, token);
+            ValidationResponseDto validationResponseDto = new ValidationResponseDto();
+            validationResponseDto.setSuccess(isSuccess);
+
+            if(isSuccess){
+                return new ResponseEntity<>(validationResponseDto, HttpStatus.OK);
+
+            }else {
+                return new ResponseEntity<>(validationResponseDto, HttpStatus.UNAUTHORIZED);
+            }
+
+        }catch(UserNotFoundException e){
+            throw new UserNotFoundException(e.getMessage());
+        }catch(InvalidSessionException e){
+            throw new InvalidSessionException(e.getMessage());
+        }
+
+
+
+
+
+
+    }
+
 
 }

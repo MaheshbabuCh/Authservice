@@ -12,5 +12,7 @@ public interface AuthService {
 
     public User setRole(String email, String role) throws Exception;
 
+    public boolean validate(long userId, String token) throws Exception;
+
 
 }
