@@ -12,4 +12,8 @@ public interface SessionRepository extends JpaRepository<Session,Long> {
 
     Optional<Session> findByUserAndToken(User user, String token);
 
+    List<Session> findByUser(User user);
+
+    Integer findCountByUser(User user);
+
 }

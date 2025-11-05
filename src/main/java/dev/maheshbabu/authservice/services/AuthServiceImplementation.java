@@ -4,6 +4,7 @@ import dev.maheshbabu.authservice.exceptions.IncorrectPasswordException;
 import dev.maheshbabu.authservice.exceptions.InvalidSessionException;
 import dev.maheshbabu.authservice.exceptions.UserAlreadyExistsException;
 import dev.maheshbabu.authservice.exceptions.UserNotFoundException;
+import dev.maheshbabu.authservice.helpers.JWTHandler;
 import dev.maheshbabu.authservice.models.Session;
 import dev.maheshbabu.authservice.models.SessionStatus;
 import dev.maheshbabu.authservice.models.User;
@@ -13,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.apache.commons.lang3.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,10 +22,12 @@ public class AuthServiceImplementation implements AuthService {
 
     private UserRepository userRepository;
     private SessionRepository sessionRepository;
+    private JWTHandler jwtHandler;
 
-    public AuthServiceImplementation(UserRepository userRepository, SessionRepository sessionRepository) {
+    public AuthServiceImplementation(UserRepository userRepository, SessionRepository sessionRepository, JWTHandler jwtHandler) {
         this.userRepository = userRepository;
         this.sessionRepository = sessionRepository;
+        this.jwtHandler = jwtHandler;
     }
 
     @Override
@@ -36,14 +40,37 @@ public class AuthServiceImplementation implements AuthService {
         User user = optionalUser.get();
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
-        if(bCryptPasswordEncoder.matches(password,user.getPassword())){
+      boolean isPasswordMatched =  bCryptPasswordEncoder.matches(password,user.getPassword());
+      User activeUser = null;
+
+       List<Session> sessionList =   sessionRepository.findByUser(user);
+
+       if(!sessionList.isEmpty()){
+           for(Session session : sessionList){
+               if(session.getSessionStatus() == SessionStatus.ACTIVE){
+                   activeUser = session.getUser();
+                   break;
+               }else if(session.getSessionStatus() == SessionStatus.LOGGED_OUT){
+                   session.setSessionStatus(SessionStatus.ACTIVE);
+                   sessionRepository.save(session);
+                   activeUser = session.getUser();
+                   break;
+               }
+           }
+       }
+
+       int sessionCount = sessionList.size();
+
+        if(isPasswordMatched && sessionCount == 0){
             Session session = new Session();
             session.setUser(user);
-            session.setToken(RandomStringUtils.randomAscii(20));
+            session.setToken(jwtHandler.generateToken(email, "ADMIN"));
             session.setSessionStatus(SessionStatus.ACTIVE);
             sessionRepository.save(session);
             return user;
-        }else {
+        }else if(isPasswordMatched){
+            return activeUser;
+        } else {
             throw new IncorrectPasswordException("Incorrect password");
         }
 
