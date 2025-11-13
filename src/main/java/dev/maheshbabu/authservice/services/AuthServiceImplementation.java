@@ -64,7 +64,7 @@ public class AuthServiceImplementation implements AuthService {
         if(isPasswordMatched && sessionCount == 0){
             Session session = new Session();
             session.setUser(user);
-            session.setToken(jwtHandler.generateToken(email, "ADMIN"));
+            session.setToken(jwtHandler.generateToken(email, "ADMIN", user.getId()));
             session.setSessionStatus(SessionStatus.ACTIVE);
             sessionRepository.save(session);
             return user;
@@ -126,7 +126,7 @@ public class AuthServiceImplementation implements AuthService {
     @Override
     public boolean validate(long userId, String token) throws Exception {
 
-        Optional<User> optionalUser = userRepository.findById(userId);
+       Optional<User> optionalUser = userRepository.findById(userId);
 
         if(optionalUser.isEmpty()) {
            return false;
@@ -134,10 +134,12 @@ public class AuthServiceImplementation implements AuthService {
 
         Optional<Session> optionalSession = sessionRepository.findByUserAndToken(optionalUser.get(), token);
 
-        if(optionalSession.isEmpty()){
+        if(optionalSession.isEmpty() && !jwtHandler.validateToken(token, userId)){
             return false;
         }else {
             return optionalSession.get().getSessionStatus() == SessionStatus.ACTIVE;
         }
+
+
     }
 }

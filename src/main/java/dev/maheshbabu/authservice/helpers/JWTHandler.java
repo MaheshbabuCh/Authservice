@@ -1,9 +1,7 @@
 package dev.maheshbabu.authservice.helpers;
 
 import dev.maheshbabu.authservice.Config;
-import io.jsonwebtoken.Jwt;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,23 +13,28 @@ public class JWTHandler {
         this.config = config;
     }
 
-    public String generateToken(String email, String role) {
+    public String generateToken(String email, String role, long userId) {
 
         return Jwts.builder()
                           .header()
                           .keyId("aKeyId")
                           .and()
                           .subject(email)
-                          .claim("role", role)
+                          .claim("role", role).claim("userId", userId)
                           .signWith(config.jwtSecretKey()).compact();
     }
 
-    public boolean validateToken(String token) {
+    public boolean validateToken(String token, Long userId) {
         try {
-            Jwts.parser().verifyWith(config.jwtSecretKey()).build().parseSignedClaims(token);
-            return true;
+            Jws<Claims> jws =  Jwts.parser().verifyWith(config.jwtSecretKey()).build().parseSignedClaims(token);
+
+            if(jws.getPayload().get("userId", Long.class) .equals(userId)) {
+                return true;
+            }
         } catch (JwtException e) {
             return false;
         }
+
+        return false;
     }
 }
