@@ -5,29 +5,41 @@ import dev.maheshbabu.authservice.exceptions.InvalidSessionException;
 import dev.maheshbabu.authservice.exceptions.UserAlreadyExistsException;
 import dev.maheshbabu.authservice.exceptions.UserNotFoundException;
 import dev.maheshbabu.authservice.helpers.JWTHandler;
+import dev.maheshbabu.authservice.models.Role;
 import dev.maheshbabu.authservice.models.Session;
 import dev.maheshbabu.authservice.models.SessionStatus;
 import dev.maheshbabu.authservice.models.User;
+import dev.maheshbabu.authservice.repositories.RoleRepository;
 import dev.maheshbabu.authservice.repositories.SessionRepository;
 import dev.maheshbabu.authservice.repositories.UserRepository;
+import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.apache.commons.lang3.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
+@NoArgsConstructor
 public class AuthServiceImplementation implements AuthService {
 
     private UserRepository userRepository;
     private SessionRepository sessionRepository;
     private JWTHandler jwtHandler;
+    private PasswordEncoder passwordEncoder;
+    private RoleRepository roleRepository;
 
-    public AuthServiceImplementation(UserRepository userRepository, SessionRepository sessionRepository, JWTHandler jwtHandler) {
+    @Autowired
+    public AuthServiceImplementation(UserRepository userRepository, SessionRepository sessionRepository, JWTHandler jwtHandler, PasswordEncoder passwordEncoder, RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.sessionRepository = sessionRepository;
         this.jwtHandler = jwtHandler;
+        this.passwordEncoder = passwordEncoder;
+        this.roleRepository = roleRepository;
     }
 
     @Override
@@ -38,9 +50,9 @@ public class AuthServiceImplementation implements AuthService {
             throw new UserNotFoundException("User not found");
         }
         User user = optionalUser.get();
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+       // BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
-      boolean isPasswordMatched =  bCryptPasswordEncoder.matches(password,user.getPassword());
+      boolean isPasswordMatched =  passwordEncoder.matches(password,user.getPassword());
       User activeUser = null;
 
        List<Session> sessionList =   sessionRepository.findByUser(user);
@@ -86,8 +98,19 @@ public class AuthServiceImplementation implements AuthService {
 
        User user = new User();
        user.setEmail(email);
-       BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-       user.setPassword(bCryptPasswordEncoder.encode(password));
+
+       Role role = new Role();
+       role.setName("ADMIN");
+       Set<Role> roles = Set.of(role);
+       user.setRoles(roles);
+
+//        Role adminRole = roleRepository.findByName("ADMIN").orElseGet(() -> {
+//            Role r = new Role();
+//            r.setName("ADMIN");
+//            return roleRepository.save(r); // persist the role first
+//        });
+
+       user.setPassword(passwordEncoder.encode(password));
 
        userRepository.save(user);
        return user;

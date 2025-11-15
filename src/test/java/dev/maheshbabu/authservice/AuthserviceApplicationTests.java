@@ -4,6 +4,8 @@ import dev.maheshbabu.authservice.oAuth2.repositories.JpaRegisteredClientReposit
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
@@ -18,6 +20,9 @@ class AuthserviceApplicationTests {
     @Autowired
     private JpaRegisteredClientRepository jpaRegisteredClientRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Test
     void contextLoads() {
     }
@@ -26,7 +31,7 @@ class AuthserviceApplicationTests {
 //    void testRegisterClientSetup() {
 //        RegisteredClient postmanClient = RegisteredClient.withId(UUID.randomUUID().toString())
 //                .clientId("postman-client")
-//                .clientSecret("postman-secret")
+//                .clientSecret(passwordEncoder.encode("postman-secret"))
 //                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
 //                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
 //                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)

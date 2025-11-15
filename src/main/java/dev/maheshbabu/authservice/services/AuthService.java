@@ -1,7 +1,9 @@
 package dev.maheshbabu.authservice.services;
 
 import dev.maheshbabu.authservice.models.User;
+import org.springframework.stereotype.Service;
 
+@Service
 public interface AuthService {
 
     public User login(String email, String password) throws Exception;

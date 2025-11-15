@@ -1,5 +1,6 @@
 package dev.maheshbabu.authservice.models;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToMany;
@@ -17,7 +18,7 @@ public class User extends BaseModel {
     private String username;
     private String password;
     private String email;
-    @ManyToMany(fetch = FetchType.EAGER)
-    private Set<Role> roles = new HashSet<>();
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private Set<Role> roles;
 
 }
