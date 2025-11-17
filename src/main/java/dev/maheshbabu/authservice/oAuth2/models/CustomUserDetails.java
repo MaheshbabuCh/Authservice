@@ -3,6 +3,7 @@ package dev.maheshbabu.authservice.oAuth2.models;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import dev.maheshbabu.authservice.models.Role;
 import dev.maheshbabu.authservice.models.User;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,7 +15,6 @@ import java.util.Collection;
 @NoArgsConstructor
 public class CustomUserDetails implements UserDetails {
 
-    private User user;
     private String password;
     private String username;
     private boolean accountNonExpired;
@@ -22,19 +22,21 @@ public class CustomUserDetails implements UserDetails {
     private boolean credentialsNonExpired;
     private boolean enabled;
     private Collection<GrantedAuthority> authorities;
+    @Getter
+    private long userId;
 
     public CustomUserDetails(User user) {
-        this.user = user;
         this.password = user.getPassword();
         this.username = user.getEmail();
         this.accountNonExpired = true;
         this.accountNonLocked = true;
         this.credentialsNonExpired = true;
         this.enabled = true;
+        this.userId = user.getId();
 
         ArrayList<GrantedAuthority> authorities = new ArrayList<>();
 
-        for(Role role: this.user.getRoles()){
+        for(Role role: user.getRoles()){
             authorities.add(new CustomGrantedAuthority(role));
         }
 
@@ -51,6 +53,7 @@ public class CustomUserDetails implements UserDetails {
     public String getPassword() {
         return this.password;
     }
+
 
     @Override
     public String getUsername() {

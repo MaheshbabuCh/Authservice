@@ -27,22 +27,25 @@ class AuthserviceApplicationTests {
     void contextLoads() {
     }
 
-//    @Test
-//    void testRegisterClientSetup() {
-//        RegisteredClient postmanClient = RegisteredClient.withId(UUID.randomUUID().toString())
-//                .clientId("postman-client")
-//                .clientSecret(passwordEncoder.encode("postman-secret"))
-//                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-//                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-//                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-//                .redirectUri("https://oauth.pstmn.io/v1/callback")
-//                .postLogoutRedirectUri("http://127.0.0.1:8080/")
-//                .scope(OidcScopes.OPENID)
-//                .scope(OidcScopes.PROFILE)
-//                .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
-//                .build();
-//
-//        jpaRegisteredClientRepository.save(postmanClient);
-//    }
+
+
+
+    @Test
+    void testRegisterClientSetup() {
+        RegisteredClient postmanClient = RegisteredClient.withId(UUID.randomUUID().toString())
+                .clientId("postman-client")
+                .clientSecret(passwordEncoder.encode("postman-secret"))
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+                .redirectUri("https://oauth.pstmn.io/v1/callback")
+                .postLogoutRedirectUri("http://127.0.0.1:8080/")
+                .scope(OidcScopes.OPENID)
+                .scope(OidcScopes.PROFILE)
+                .clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
+                .build();
+
+        jpaRegisteredClientRepository.save(postmanClient);
+    }
 
 }
