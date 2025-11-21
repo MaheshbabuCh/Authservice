@@ -16,6 +16,8 @@ import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
 import dev.maheshbabu.authservice.oAuth2.models.CustomUserDetails;
+import dev.maheshbabu.authservice.oAuth2.services.RestAccessDeniedHandler;
+import dev.maheshbabu.authservice.oAuth2.services.RestAuthenticationEntryPoint;
 import dev.maheshbabu.authservice.services.AuthService;
 import dev.maheshbabu.authservice.services.AuthServiceImplementation;
 import org.springframework.context.annotation.Bean;
@@ -64,15 +66,11 @@ public class SecurityConfig {
         http
                 .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
                 .with(authorizationServerConfigurer, (authorizationServer) ->
-                        authorizationServer
-                                .oidc(Customizer.withDefaults())	// Enable OpenID Connect 1.0
+                        authorizationServer.oidc(Customizer.withDefaults())
                 )
-                .authorizeHttpRequests((authorize) ->
-                        authorize
-                                .anyRequest().authenticated()
+                .authorizeHttpRequests((authorize) -> authorize
+                        .anyRequest().authenticated()
                 )
-                // Redirect to the login page when not authenticated from the
-                // authorization endpoint
                 .exceptionHandling((exceptions) -> exceptions
                         .defaultAuthenticationEntryPointFor(
                                 new LoginUrlAuthenticationEntryPoint("/login"),
@@ -94,10 +92,11 @@ public class SecurityConfig {
                 // Form login handles the redirect to the login page from the
                 // authorization server filter chain
                 .formLogin(Customizer.withDefaults());
-               // .csrf().disable();
+        // .csrf().disable();
 
         return http.build();
     }
+
 
 //    @Bean
 //    public UserDetailsService userDetailsService() {
@@ -189,5 +188,6 @@ public class SecurityConfig {
             }
         };
     }
+
 
 }
