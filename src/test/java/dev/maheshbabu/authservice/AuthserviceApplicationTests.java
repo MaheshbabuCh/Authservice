@@ -33,11 +33,12 @@ class AuthserviceApplicationTests {
 //    @Test
 //    void testRegisterClientSetup() {
 //        RegisteredClient postmanClient = RegisteredClient.withId(UUID.randomUUID().toString())
-//                .clientId("postman-client")
-//                .clientSecret(passwordEncoder.encode("postman-secret"))
+//                .clientId("postman-client2")
+//                .clientSecret(passwordEncoder.encode("postman-secret2"))
 //                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
 //                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
 //                .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+//                .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
 //                .redirectUri("https://oauth.pstmn.io/v1/callback")
 //                .postLogoutRedirectUri("http://127.0.0.1:8080/")
 //                .scope(OidcScopes.OPENID)
